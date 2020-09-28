@@ -2,6 +2,7 @@
 
 namespace Bogatyrev\controllers;
 
+use Bogatyrev\Question;
 use Psr\Http\Message\ServerRequestInterface;
 use Bogatyrev\repositories\QuestionRepository;
 use Bogatyrev\translate\TranslatorInterface;
@@ -59,16 +60,13 @@ class QuestionController
     public function createItem(ServerRequestInterface $request)
     {
         $json = $request->getBody()->getContents();
-        $phoneNumber = $this->phoneNumberFactory->createFromJson($json);
-        if ($phoneNumber === null || ! $phoneNumber->validate()) {
-            throw new BadRequestException("Invalid data");
+        $data = \json_decode($json, true);
+        if (json_last_error() !== \JSON_ERROR_NONE) {
+            throw new \Error('Json decode error');
         }
-        $phoneNumber->updated();
-        $result = $this->phoneNumberRepository->save($phoneNumber);
+        $question = Question::fromArray($data);
+        $result = $this->questionRepository->save($question);
 
-        return [
-            'success' => $result,
-            'id' => $phoneNumber->getId(),
-        ];
+        return $question->toArray();
     }
 }

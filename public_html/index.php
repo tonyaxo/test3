@@ -7,14 +7,12 @@ use League\Route\Strategy\JsonStrategy;
 use Zend\Diactoros\ServerRequestFactory;
 use Http\Factory\Diactoros\ResponseFactory;
 use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
-use Bogatyrev\controllers\PhoneNumbersController;
 use Bogatyrev\controllers\QuestionController;
 use Bogatyrev\repositories\CsvFilePersistance;
 use Bogatyrev\repositories\JsonFilePersistance;
 use Bogatyrev\repositories\PersistanceInterface;
 use Bogatyrev\repositories\QuestionRepository;
 use Bogatyrev\translate\DummyTranslator;
-use Bogatyrev\translate\GoogleTranslator;
 use Bogatyrev\translate\TranslatorInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -28,17 +26,6 @@ $dotenv->load(__DIR__ . '/../.env');
 
 // Configure di container
 $container = new Container;
-
-// Db connection
-// $container->add(PDO::class, function() {
-//     $dbName = getenv('MYSQL_DB');
-//     $host = getenv('MYSQL_HOST');
-//     return new PDO("mysql:dbname=$dbName;host=$host", getenv('MYSQL_USER'), getenv('MYSQL_PASSWORD'), [
-//         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-//     ]);
-// }, true);
-
-// $container->add(PhoneNumberFactory::class);
 
 $container->add(QuestionRepository::class)
     ->addArgument(PersistanceInterface::class)
@@ -68,14 +55,14 @@ $container->add(TranslatorInterface::class, function() {
 
 // Add json file persistance
 $container->add(PersistanceInterface::class, function() {
-    $filePath = getenv('JSON_PERSISTANCE_DATA') === false ? __DIR__ . '/../logs' : getenv('JSON_PERSISTANCE_DATA');
+    $filePath = getenv('JSON_PERSISTANCE_DATA');
     $persistance = new JsonFilePersistance($filePath);
     return $persistance;
 }, true);
 
 // Add csv file persistance
 // $container->add(PersistanceInterface::class, function() {
-//     $filePath = getenv('CSV_PERSISTANCE_DATA') === false ? __DIR__ . '/../logs' : getenv('CSV_PERSISTANCE_DATA');
+//     $filePath = getenv('CSV_PERSISTANCE_DATA');
 //     $persistance = new CsvFilePersistance($filePath);
 //     return $persistance;
 // }, true);
